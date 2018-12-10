@@ -1,0 +1,51 @@
+﻿@model PluginModel
+@inject IEventPublisher eventPublisher
+<div asp-validation-summary="All"></div>
+<input asp-for="SystemName" type="hidden" />
+@if (ViewBag.RefreshPage == true)
+{
+    <script type="text/javascript">
+        try {window.opener.document.forms['@(Context.Request.Query["formId"])'].@(Context.Request.Query["btnId"]).click();}
+        catch (e){}
+        window.close();
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        $("#plugin-edit").kendoTabStrip({
+            animation: {
+                open: {
+                    effects: "fadeIn"
+                }
+            },
+            select: tabstrip_on_tab_select
+        });
+    });
+</script>
+<vc:admin-widget widget-zone="plugin_details_top" additional-data="Model" />
+<div id="plugin-edit">
+    <ul>
+        <li tab-index="0">
+            @T("Admin.Configuration.Plugins.Info")
+        </li>
+        <li tab-index="1">
+            @T("Admin.Configuration.Plugins.Stores")
+        </li>
+    </ul>
+    <div>
+        <partial name="_CreateOrUpdatePlugin.TabInfo" model="Model" />
+    </div>
+    <div>
+        <partial name="_TabStores" model="Model" />
+    </div>
+</div>
+<vc:admin-widget widget-zone="plugin_details_bottom" additional-data="Model" />
+@{
+    //custom tabs
+    var eventMessage = new AdminTabStripCreated(this.Html, "plugin-edit");
+    eventPublisher.Publish(eventMessage);
+    foreach (var eventBlock in eventMessage.BlocksToRender)
+    {
+        @eventBlock
+    }
+}

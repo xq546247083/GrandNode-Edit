@@ -1,0 +1,68 @@
+﻿@model ShippingMethodRestrictionModel
+@inject IEventPublisher eventPublisher
+@{
+    //page title
+    ViewBag.Title = T("Admin.Configuration.Shipping.Restrictions").Text;
+}
+<form asp-controller="Shipping" asp-action="Restrictions" method="post">
+    <antiforgery-token />
+    <div class="row">
+        <div class="col-md-12">
+            <div class="portlet light form-fit">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="fa fa-truck"></i>
+                        @T("Admin.Configuration.Shipping.Restrictions")
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-success" type="submit" name="save"><i class="fa fa-check"></i> @T("Admin.Common.Save") </button>
+                        <vc:admin-widget widget-zone="shipping_restriction_list_buttons" additional-data="null" />
+                    </div>
+                </div>
+                <div class="portlet-body form">
+                    <script type="text/javascript">
+                        $(document).ready(function () {
+                            $('#shippingrestriction-edit').show();
+                            $("#shippingrestriction-edit").kendoTabStrip({
+                                animation: {
+                                    open: {
+                                        effects: "fadeIn"
+                                    }
+                                },
+                                select: tabstrip_on_tab_select
+                            });
+                        });
+                    </script>
+                    <div id="shippingrestriction-edit" style="display:none">
+                        <ul>
+                            <li tab-index="0">
+                                @T("Admin.Configuration.Shipping.Restrictions.Country")
+                            </li>
+                            <li tab-index="1">
+                                @T("Admin.Configuration.Shipping.Restrictions.Role")
+                            </li>
+                        </ul>
+                        <div>
+                           <partial name="Restrictions.TabCountry" model="Model" />
+                        </div>
+                        <div>
+                           <partial name="Restrictions.TabRole" model="Model" />
+                        </div>
+                    </div>
+                    @{
+                        //custom tabs
+                        var eventMessage = new AdminTabStripCreated(this.Html, "shippingrestriction-edit");
+                        eventPublisher.Publish(eventMessage);
+                        foreach (var eventBlock in eventMessage.BlocksToRender)
+                        {
+                            @eventBlock
+                        }
+                    }
+
+                    @*save selected tab index*@
+                    <input type="hidden" id="selected-tab-index" name="selected-tab-index" value="@(GetSelectedTabIndex())">
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

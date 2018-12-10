@@ -1,0 +1,46 @@
+﻿@model CurrencyModel
+@inject IEventPublisher eventPublisher
+<div asp-validation-summary="All"></div>
+<input asp-for="Id" type="hidden" />
+<script>
+    $(document).ready(function () {
+        $("#currency-edit").kendoTabStrip({
+            animation: {
+                open: {
+                    effects: "fadeIn"
+                }
+            },
+            select: tabstrip_on_tab_select
+        });
+    });
+</script>
+<vc:admin-widget widget-zone="currency_details_top" additional-data="Model" />
+<div id="currency-edit">
+    <ul>
+        <li tab-index="0">
+            @T("Admin.Configuration.Currencies.Info")
+        </li>
+        <li tab-index="1">
+            @T("Admin.Configuration.Currencies.Stores")
+        </li>
+    </ul>
+    <div>
+        <partial name="_CreateOrUpdate.TabInfo" model="Model" />
+    </div>
+    <div>
+        <partial name="_TabStores" model="Model" />
+    </div>
+</div>
+<vc:admin-widget widget-zone="currency_details_bottom" additional-data="Model" />
+@{
+    //custom tabs
+    var eventMessage = new AdminTabStripCreated(this.Html, "currency-edit");
+    eventPublisher.Publish(eventMessage);
+    foreach (var eventBlock in eventMessage.BlocksToRender)
+    {
+        @eventBlock
+    }
+}
+
+@*save selected tab index*@
+<input type="hidden" id="selected-tab-index" name="selected-tab-index" value="@(GetSelectedTabIndex())">

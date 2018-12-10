@@ -1,0 +1,31 @@
+﻿@model CustomerRoleModel
+@{
+    //page title
+    ViewBag.Title = T("Admin.Customers.CustomerRoles.EditCustomerRoleDetails").Text;
+}
+<form asp-controller="CustomerRole" asp-action="Edit" method="post" id="customerrole-form">
+    <antiforgery-token />
+    <div class="row">
+        <div class="col-md-12">
+            <div class="portlet light form-fit">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="fa fa-users"></i>
+                        @T("Admin.Customers.CustomerRoles.EditCustomerRoleDetails") - @Model.Name
+                        <small><i class="fa fa-arrow-circle-left"></i>@Html.ActionLink(T("Admin.Customers.CustomerRoles.BackToList").Text, "List")</small>
+                    </div>
+                    <div class="actions util-btn-margin-bottom-5">
+                        <button class="btn btn-success" type="submit" name="save"><i class="fa fa-check"></i> @T("Admin.Common.Save") </button>
+                        <button class="btn btn-success" type="submit" name="save-continue"><i class="fa fa-check-circle"></i> @T("Admin.Common.SaveContinue") </button>
+                        <span id="customerrole-delete" class="btn red"><i class="fa fa-trash-o"></i> @T("Admin.Common.Delete")</span>
+                        <vc:admin-widget widget-zone="customer_role_details_buttons" additional-data="Model" />
+                    </div>
+                </div>
+                <div class="portlet-body form">
+                   <partial name="_CreateOrUpdate" model="Model" />
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+@Html.DeleteConfirmation("customerrole-delete")

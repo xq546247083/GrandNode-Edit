@@ -1,0 +1,56 @@
+﻿@model ReturnRequestModel
+@inject AdminAreaSettings adminAreaSettings
+@inject OrderSettings orderSettings
+@inject IEventPublisher eventPublisher
+@using Grand.Core.Domain.Orders;
+<div asp-validation-summary="All"></div>
+<input asp-for="Id" type="hidden" />
+<script>
+    $(document).ready(function () {
+        $('#returnrequest-edit').show();
+        $("#returnrequest-edit").kendoTabStrip({
+            animation: {
+                open: {
+                    effects: "fadeIn"
+                }
+            },
+            select: tabstrip_on_tab_select
+        });
+    });
+</script>
+
+<div id="returnrequest-edit" style="display:none">
+    <ul>
+        <li tab-index="0">
+            @T("Admin.ReturnRequests.Info")
+        </li>
+        @if (orderSettings.ReturnRequests_AllowToSpecifyPickupAddress)
+        {
+            <li tab-index="1">
+                @T("Admin.ReturnRequests.Address")
+            </li>
+        }
+    </ul>
+    <div>
+       <partial name="_CreateOrUpdate.TabInfo" model="Model" />
+    </div>
+    @if (orderSettings.ReturnRequests_AllowToSpecifyPickupAddress)
+    {
+        <div>
+           <partial name="_CreateOrUpdate.TabAddress" model="Model" />
+        </div>
+    }
+</div>
+
+@{
+    //custom tabs
+    var eventMessage = new AdminTabStripCreated(this.Html, "returnrequest-edit");
+    eventPublisher.Publish(eventMessage);
+    foreach (var eventBlock in eventMessage.BlocksToRender)
+    {
+        @eventBlock
+    }
+}
+
+@*save selected tab index*@
+<input type="hidden" id="selected-tab-index" name="selected-tab-index" value="@(GetSelectedTabIndex())">

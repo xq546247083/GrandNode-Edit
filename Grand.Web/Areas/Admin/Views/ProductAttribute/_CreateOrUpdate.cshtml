@@ -1,0 +1,57 @@
+﻿@model ProductAttributeModel
+@inject IEventPublisher eventPublisher
+<div asp-validation-summary="All"></div>
+<input asp-for="Id" type="hidden" />
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#product-attribute-edit').show();
+        $("#product-attribute-edit").kendoTabStrip({
+            animation: {
+                open: {
+                    effects: "fadeIn"
+                }
+            },
+            select: tabstrip_on_tab_select
+        });
+    });
+</script>
+
+<div id="product-attribute-edit" style="display:none">
+    <ul>
+        <li tab-index="0">
+            @T("Admin.Catalog.Attributes.ProductAttributes.Info")
+        </li>
+        @if (!string.IsNullOrEmpty(Model.Id))
+        {
+        <li tab-index="1">
+            @T("Admin.Catalog.Attributes.ProductAttributes.UsedByProducts")
+        </li>
+        }
+        <li tab-index="2">
+            @T("Admin.Catalog.Attributes.ProductAttributes.PredefinedValues")
+        </li>
+    </ul>
+    <div>
+       <partial name="_CreateOrUpdate.TabInfo" model="Model" />
+    </div>
+    @if (!string.IsNullOrEmpty(Model.Id))
+    {
+        <div>
+           <partial name="_CreateOrUpdate.TabUsedByProducts" model="Model" />
+        </div>
+    }
+    <div>
+       <partial name="_CreateOrUpdate.TabPredefinedValues" model="Model" />
+    </div>
+</div>
+@{
+    //custom tabs
+    var eventMessage = new AdminTabStripCreated(this.Html, "product-attribute-edit");
+    eventPublisher.Publish(eventMessage);
+    foreach (var eventBlock in eventMessage.BlocksToRender)
+    {
+        @eventBlock
+    }
+}
+@*save selected tab index*@
+<input type="hidden" id="selected-tab-index" name="selected-tab-index" value="@(GetSelectedTabIndex())">

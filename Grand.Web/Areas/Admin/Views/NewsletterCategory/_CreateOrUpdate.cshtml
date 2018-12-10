@@ -1,0 +1,46 @@
+﻿@model NewsletterCategoryModel
+@inject IEventPublisher eventPublisher
+
+<div asp-validation-summary="All"></div>
+<input asp-for="Id" type="hidden" />
+<script>
+    $(document).ready(function () {
+        $('#newslettercategory-edit').show();
+        $("#newslettercategory-edit").kendoTabStrip({
+            animation: {
+                open: {
+                    effects: "fadeIn"
+                }
+            },
+            select: tabstrip_on_tab_select
+        });
+    });
+</script>
+<div id="newslettercategory-edit" style="display:none">
+    <ul>
+        <li tab-index="0">
+            @T("Admin.Promotions.NewsletterCategory.Info")
+        </li>
+        <li tab-index="1">
+            @T("Admin.Promotions.NewsletterCategory.Stores")
+        </li>
+    </ul>
+    <div>
+        <partial name="_CreateOrUpdate.TabInfo" model="Model" />
+    </div>
+    <div>
+        <partial name="_TabStores" model="Model" />
+    </div>
+</div>
+@{
+    //custom tabs
+    var eventMessage = new AdminTabStripCreated(this.Html, "newslettercategory-edit");
+    eventPublisher.Publish(eventMessage);
+    foreach (var eventBlock in eventMessage.BlocksToRender)
+    {
+        @eventBlock
+    }
+}
+
+@*save selected tab index*@
+<input type="hidden" id="selected-tab-index" name="selected-tab-index" value="@(GetSelectedTabIndex())">

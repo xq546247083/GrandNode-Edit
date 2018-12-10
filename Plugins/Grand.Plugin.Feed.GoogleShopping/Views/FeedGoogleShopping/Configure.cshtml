@@ -1,0 +1,39 @@
+﻿@{
+    Layout = "_ConfigurePlugin";
+    Html.AddCssFileParts("~/Plugins/Feed.GoogleShopping/Content/styles.css");
+}
+@model FeedGoogleShoppingModel
+@using Grand.Plugin.Feed.GoogleShopping.Models;
+@using Grand.Framework;
+@using Grand.Framework.UI;
+<form asp-controller="FeedGoogleShopping" asp-action="Configure" method="post">
+    <antiforgery-token />
+    <div id="googlebase-configure">
+        <ul>
+            <li tab-index="0">
+                @T("Plugins.Feed.GoogleShopping.General")
+            </li>
+            <li tab-index="1">
+                @T("Plugins.Feed.GoogleShopping.Override")
+            </li>
+        </ul>
+        <div>
+            <partial name="TabGeneral.Configure.cshtml" />
+        </div>
+        <div>
+            <partial name="TabOverride.Configure.cshtml" />
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#googlebase-configure").kendoTabStrip({
+                animation: {
+                    open: {
+                        effects: "fadeIn"
+                    }
+                },
+                select: tabstrip_on_tab_select
+            });
+        });
+    </script>
+</form>

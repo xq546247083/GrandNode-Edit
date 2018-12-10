@@ -1,0 +1,233 @@
+﻿@model MessageTemplateModel
+
+<div class="form-horizontal">
+    <div class="form-body">
+        <div class="form-group">
+            <admin-label asp-for="Name" />
+            <div class="col-md-9 col-sm-9">
+                @if (!String.IsNullOrEmpty(Model.Id))
+                {
+                    <label class="control-label">@Model.Name</label>
+                        <input asp-for="Name" type="hidden" />
+                }
+                else
+                {
+                    <admin-input asp-for="Name" />
+                }
+            </div>
+        </div>
+        <div class="form-group">
+            <admin-label asp-for="IsActive" />
+            <div class="col-md-9 col-sm-9">
+                <label class="mt-checkbox mt-checkbox-outline">
+                    <admin-input asp-for="IsActive" />
+                    <span></span>
+                </label>
+                <span asp-validation-for="IsActive"></span>
+            </div>
+        </div>
+    </div>
+</div>
+@(Html.LocalizedEditor<MessageTemplateModel, MessageTemplateLocalizedModel>("messagetemplate-localized",
+    @<div class="form-horizontal">
+        <div class="form-body">
+            <div class="form-group">
+                <admin-label asp-for="@Model.Locales[item].BccEmailAddresses" />
+                <div class="col-md-9 col-sm-9">
+                    <admin-input asp-for="@Model.Locales[item].BccEmailAddresses" />
+                    <span asp-validation-for="@Model.Locales[item].BccEmailAddresses"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <admin-label asp-for="@Model.Locales[item].Subject" />
+                <div class="col-md-9 col-sm-9">
+                    <admin-input asp-for="@Model.Locales[item].Subject" />
+                    <span asp-validation-for="@Model.Locales[item].Subject"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <admin-label asp-for="@Model.Locales[item].Body" />
+                <div class="col-md-9 col-sm-9">
+                    <admin-input asp-for="@Model.Locales[item].Body" asp-template="RichEditor" />
+                    <span asp-validation-for="@Model.Locales[item].Body"></span>
+                </div>
+            </div>
+            @if (!String.IsNullOrEmpty(Model.Id))
+            {
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-3 control-label">@T("Admin.ContentManagement.MessageTemplates.Test")</label>
+                    <div class="col-md-9 col-sm-9">
+                        <input type="button" class="btn green" value="@T("Admin.ContentManagement.MessageTemplates.Test")" onclick="setLocation('@(Url.Action("TestTemplate", new { id = Model.Id, languageId = Model.Locales[item].LanguageId }))')" />
+                    </div>
+                </div>
+            }
+            <div class="form-group">
+                <admin-label asp-for="@Model.Locales[item].EmailAccountId" />
+                <div class="col-md-9 col-sm-9">
+                    <admin-select asp-for="@Model.Locales[item].EmailAccountId" asp-items="@{new SelectList(Model.AvailableEmailAccounts, "Id", "DisplayName", Model.Locales[item].EmailAccountId)}" />
+                    <span asp-validation-for="Locales[item].EmailAccountId"></span>
+                </div>
+            </div>
+            <input asp-for="@Model.Locales[item].LanguageId" type="hidden" />
+        </div>
+    </div>
+    ,
+    @<div class="form-horizontal">
+        <div class="form-body">
+            <div class="form-group">
+                <admin-label asp-for="BccEmailAddresses" />
+                <div class="col-md-9 col-sm-9">
+                    <admin-input asp-for="BccEmailAddresses" />
+                    <span asp-validation-for="BccEmailAddresses"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <admin-label asp-for="Subject" />
+                <div class="col-md-9 col-sm-9">
+                    <admin-input asp-for="Subject" />
+                    <span asp-validation-for="Subject"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <admin-label asp-for="Body" />
+                <div class="col-md-9 col-sm-9">
+                    <div>
+                        <label>@T("Admin.ContentManagement.MessageTemplates.Fields.AllowedTokens")</label>
+                        <input type="search" name="SearchTokens" class="form-control SearchTokens" placeholder="@T("Search")" />
+                    </div>
+                    <div class="AllowedTokens">
+                        @foreach (var token in Model.AllowedTokens)
+                        {
+                            <button type="button" onclick="AddTokenToEditor(this)" class="btn btn-info">@token</button>
+                        }
+                    </div>
+                    <admin-input asp-for="Body" asp-template="RichEditor"/>
+                    <span asp-validation-for="Body"></span>
+                </div>
+            </div>
+            @if (!String.IsNullOrEmpty(Model.Id))
+            {
+                <div class="form-group">
+                    <label class="col-md-3 col-sm-3 control-label">
+                        @T("Admin.ContentManagement.MessageTemplates.Test")
+                    </label>
+                    <div class="col-md-9 col-sm-9">
+                        <input type="button" class="btn green" value="@T("Admin.ContentManagement.MessageTemplates.Test")" onclick="setLocation('@(Url.Action("TestTemplate", new { id = Model.Id }))')" />
+                    </div>
+                </div>
+            }
+            <div class="form-group">
+                <admin-label asp-for="EmailAccountId" />
+                <div class="col-md-9 col-sm-9">
+                    <admin-select asp-for="EmailAccountId" asp-items="@{new SelectList(Model.AvailableEmailAccounts, "Id", "DisplayName")}" />
+                    <span asp-validation-for="EmailAccountId"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    ))
+<div class="form-horizontal">
+    <div class="form-body">
+        <div class="form-group">
+            <admin-label asp-for="SendImmediately" />
+            <div class="col-md-9 col-sm-9">
+                <label class="mt-checkbox mt-checkbox-outline">
+                    <admin-input asp-for="SendImmediately" />
+                    <span></span>
+                </label>
+                <span asp-validation-for="SendImmediately"></span>
+            </div>
+        </div>
+        <div class="form-group" id="pnl-send-after">
+            <admin-label asp-for="DelayBeforeSend" />
+            <div class="col-md-9 col-sm-9">
+                <div class="col-md-3 col-sm-3">
+                    <admin-input asp-for="DelayBeforeSend" />
+                    <span asp-validation-for="DelayBeforeSend"></span>
+                </div>
+                <div class="col-md-3 col-sm-3">
+                    <admin-select asp-for="DelayPeriodId" asp-items="((Grand.Core.Domain.Messages.MessageDelayPeriod)Model.DelayPeriodId).ToSelectList()" />
+                    <span asp-validation-for="DelayPeriodId"></span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <admin-label asp-for="AttachedDownloadId" />
+            <div class="col-md-9 col-sm-9">
+                @{
+                    //Static file attachments do not support URLs yet
+                    //A store owner have to upload a file
+                    //we store a value into "ViewData" and then use it in the Download.cshtml file
+                    ViewData["Grand.DownloadEditor.DisableUrl"] = true;
+                }
+                <label class="mt-checkbox mt-checkbox-outline">
+                    <admin-input asp-for="HasAttachedDownload" />@T("Admin.ContentManagement.MessageTemplates.Fields.AttachedDownload.Exists")
+                    <span></span>
+                </label>
+                <div id="pnlAttachedDownload">
+                    <admin-input asp-for="AttachedDownloadId" />
+                    <span asp-validation-for="AttachedDownloadId"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+        $(document).ready(function () {
+            $("#@Html.FieldIdFor(model => model.HasAttachedDownload)").change(toggleHasAttachedDownload);
+            $("#@Html.FieldIdFor(model => model.SendImmediately)").click(sendImmediately);
+            toggleHasAttachedDownload();
+            sendImmediately();
+            $(".SearchTokens").on("input", function (e) { SearchTokens(e); })
+            $("input").click(function (e) {
+                onInputFocus = $(e.target);
+            });
+            setTimeout(function () {
+                tinyMCE.editors[0].focus();
+            }, 2000)
+        });
+
+        function toggleHasAttachedDownload() {
+            if ($('#@Html.FieldIdFor(model => model.HasAttachedDownload)').is(':checked')) {
+                $('#pnlAttachedDownload').show();
+            }
+            else {
+                $('#pnlAttachedDownload').hide();
+            }
+        }
+
+        function sendImmediately() {
+            if ($('#@Html.FieldIdFor(model => model.SendImmediately)').is(':checked'))
+                $('#pnl-send-after').hide();
+            else
+                $('#pnl-send-after').show();
+    }
+
+    function SearchTokens(e) {
+        var searchVal = $(e.target).val();
+        var TokensPnl = $(e.target).closest(".form-group").find(".AllowedTokens");
+        $(TokensPnl).find(".btn").show()
+            .each(function (i, c) {
+                var Token = $(c).text();
+                if (Token.search(new RegExp(searchVal, "i")) == -1)
+                {
+                    $(c).hide();
+                }
+             });
+
+    }
+    function AddTokenToEditor(e) {
+        tinyMCE.activeEditor.execCommand('mceInsertContent', false, $(e).text());
+    }
+</script>
+<style>
+.AllowedTokens {
+    height: 200px;
+    overflow: scroll;
+    overflow-x: hidden;
+    padding: 3px;
+}
+.AllowedTokens .btn {
+    margin: 2px;
+}
+</style>

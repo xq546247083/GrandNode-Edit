@@ -1,0 +1,115 @@
+﻿@model CustomerActionModel
+@inject IEventPublisher eventPublisher
+<input asp-for="Id" type="hidden" />
+@{
+    var validationSummary = Html.ValidationSummary(false);
+    if (!String.IsNullOrEmpty(validationSummary.ToString()))
+    {
+        <div class="message-error">@validationSummary</div>
+    }
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#customeraction-edit").show();
+        $("#customeraction-edit").kendoTabStrip({
+            animation: {
+                open: {
+                    effects: "fadeIn"
+                }
+            },
+            select: tabstrip_on_tab_select
+        });
+
+        $("#@Html.FieldIdFor(model => model.ReactionTypeId)").change(toggleReaction);
+        toggleReaction();
+
+        function toggleReaction() {
+            var selectedReactionTypeId = $("#@Html.FieldIdFor(model => model.ReactionTypeId)").val();
+            if (selectedReactionTypeId == @(((int)Grand.Core.Domain.Customers.CustomerReactionTypeEnum.Banner).ToString()))
+            {
+                $('#plnBanner').show();
+                $('#plnInteractiveForm').hide();
+                $('#plnMessage').hide();
+                $('#plnRole').hide();
+                $('#plnTag').hide();
+            }
+            if (selectedReactionTypeId == @(((int)Grand.Core.Domain.Customers.CustomerReactionTypeEnum.InteractiveForm).ToString()))
+            {
+                $('#plnBanner').hide();
+                $('#plnInteractiveForm').show();
+                $('#plnMessage').hide();
+                $('#plnRole').hide();
+                $('#plnTag').hide();
+            }
+            else if (selectedReactionTypeId == @(((int)Grand.Core.Domain.Customers.CustomerReactionTypeEnum.Email).ToString()))
+            {
+                $('#plnBanner').hide();
+                $('#plnInteractiveForm').hide();
+                $('#plnMessage').show();
+                $('#plnRole').hide();
+                $('#plnTag').hide();
+
+            } else if (selectedReactionTypeId == @(((int)Grand.Core.Domain.Customers.CustomerReactionTypeEnum.AssignToCustomerRole).ToString()))
+            {
+                $('#plnBanner').hide();
+                $('#plnInteractiveForm').hide();
+                $('#plnMessage').hide();
+                $('#plnRole').show();
+                $('#plnTag').hide();
+
+            } else if (selectedReactionTypeId == @(((int)Grand.Core.Domain.Customers.CustomerReactionTypeEnum.AssignToCustomerTag).ToString()))
+            {
+                $('#plnBanner').hide();
+                $('#plnInteractiveForm').hide();
+                $('#plnMessage').hide();
+                $('#plnRole').hide();
+                $('#plnTag').show();
+            }
+        }
+
+
+    });
+
+
+
+</script>
+
+<div id="customeraction-edit" style="display:none">
+    <ul>
+        <li tab-index="0">
+            @T("Admin.Customers.CustomerAction.Info")
+        </li>
+        <li tab-index="1">
+            @T("Admin.Customers.CustomerAction.Conditions")
+        </li>
+        <li tab-index="2">
+            @T("Admin.Customers.CustomerAction.Reaction")
+        </li>
+        <li tab-index="3">
+            @T("Admin.Customers.CustomerAction.History")
+        </li>
+    </ul>
+    <div>
+       <partial name="_CreateOrUpdate.TabInfo" model="Model" />
+    </div>
+    <div>
+       <partial name="_CreateOrUpdate.TabConditions" model="Model" />
+    </div>
+    <div>
+       <partial name="_CreateOrUpdate.TabReaction" model="Model" />
+    </div>
+    <div>
+       <partial name="_CreateOrUpdate.TabHistory" model="Model" />
+    </div>
+</div>
+@{
+    //custom tabs
+    var eventMessage = new AdminTabStripCreated(this.Html, "customeraction-edit");
+    eventPublisher.Publish(eventMessage);
+    foreach (var eventBlock in eventMessage.BlocksToRender)
+    {
+        @eventBlock
+    }
+}
+@*save selected tab index*@
+<input type="hidden" id="selected-tab-index" name="selected-tab-index" value="@(GetSelectedTabIndex())">

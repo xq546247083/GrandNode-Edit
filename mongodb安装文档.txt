@@ -1,0 +1,5 @@
+cd "C:\Program Files\MongoDB\Server\4.0\bin\"
+.\mongod
+use sanbo
+db.createUser({ user: "root",pwd: "123456",customData:{name:"root"},roles:[{ role: "userAdminAnyDatabase",db: "admin" }]})
+db.auth('root','123456')

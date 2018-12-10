@@ -1,0 +1,54 @@
+﻿@model AffiliateModel
+<div asp-validation-summary="All"></div>
+<input asp-for="Id" type="hidden" />
+<script>
+    $(document).ready(function () {
+        $("#affiliate-edit").kendoTabStrip({
+            animation: {
+                open: {
+                    effects: "fadeIn"
+                }
+            },
+            select: tabstrip_on_tab_select
+        });
+    });
+</script>
+<div id="affiliate-edit">
+    <ul>
+        <li tab-index="0">
+            @T("Admin.Affiliates.Info")
+        </li>
+        @if (!String.IsNullOrEmpty(Model.Id))
+        {
+            <li tab-index="1">
+                @T("Admin.Affiliates.Customers")
+            </li>
+            <li tab-index="2">
+                @T("Admin.Affiliates.Orders")
+            </li>
+        }
+    </ul>
+    <div>
+       <partial name="_CreateOrUpdate.TabInfo" model="Model" />
+    </div>
+    @if (!String.IsNullOrEmpty(Model.Id))
+    {
+        <div>
+           <partial name="_CreateOrUpdate.TabCustomers" model="Model" />
+        </div>
+        <div>
+            @await Component.InvokeAsync("Affiliate", new { affiliateId = Model.Id })
+        </div>
+    }
+</div>
+@{
+    //custom tabs
+    var eventMessage = new AdminTabStripCreated(this.Html, "affiliate-edit");
+    EngineContext.Current.Resolve<IEventPublisher>().Publish(eventMessage);
+    foreach (var eventBlock in eventMessage.BlocksToRender)
+    {
+        @eventBlock
+    }
+}
+@*save selected tab index*@
+<input type="hidden" id="selected-tab-index" name="selected-tab-index" value="@(GetSelectedTabIndex())">

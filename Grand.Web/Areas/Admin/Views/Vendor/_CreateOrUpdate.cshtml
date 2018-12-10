@@ -1,0 +1,68 @@
+﻿@model VendorModel
+@inject IEventPublisher eventPublisher
+<div asp-validation-summary="All"></div>
+<input asp-for="Id" type="hidden" />
+<script>
+    $(document).ready(function () {
+        $("#vendor-edit").show();
+        $("#vendor-edit").kendoTabStrip({
+            animation: {
+                open: {
+                    effects: "fadeIn"
+                }
+            },
+            select: tabstrip_on_tab_select
+        });
+    });
+</script>
+<div id="vendor-edit" style="display:none">
+    <ul>
+        <li tab-index="0">
+            @T("Admin.Vendors.Info")
+        </li>
+        <li tab-index="1">
+            @T("Admin.Common.SEO")
+        </li>
+        <li tab-index="2">
+            @T("Admin.Vendors.Discounts")
+        </li>
+        @if (!String.IsNullOrEmpty(Model.Id))
+        {
+            <li tab-index="3">
+                @T("Admin.Vendors.VendorNotes")
+            </li>
+            <li tab-index="4">
+                @T("Admin.Vendors.Reviews")
+            </li>
+        }
+    </ul>
+    <div>
+       <partial name="_CreateOrUpdate.TabInfo" model="Model" />
+    </div>
+    <div>
+       <partial name="_CreateOrUpdate.TabSeo" model="Model" />
+    </div>
+    <div>
+       <partial name="_CreateOrUpdate.TabDiscounts" model="Model" />
+    </div>
+    @if (!String.IsNullOrEmpty(Model.Id))
+    {
+        <div>
+           <partial name="_CreateOrUpdate.TabVendorNotes" model="Model" />
+        </div>
+        <div>
+           <partial name="_CreateOrUpdate.TabVendorReviews" model="Model" />
+        </div>
+    }
+</div>
+@{
+    //custom tabs
+    var eventMessage = new AdminTabStripCreated(this.Html, "vendor-edit");
+    eventPublisher.Publish(eventMessage);
+    foreach (var eventBlock in eventMessage.BlocksToRender)
+    {
+        @eventBlock
+    }
+}
+@*save selected tab index*@
+<input type="hidden" id="selected-tab-index" name="selected-tab-index" value="@(GetSelectedTabIndex())">

@@ -1,0 +1,82 @@
+﻿@model OrderSettingsModel
+@inject IEventPublisher eventPublisher
+@{
+    //page title
+    ViewBag.Title = T("Admin.Configuration.Settings.Order").Text;
+}
+<form asp-controller="Setting" asp-action="Order" method="post">
+    <antiforgery-token />
+    <div asp-validation-summary="All"></div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="portlet light form-fit">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="fa fa-fw fa-sliders"></i>
+                        @T("Admin.Configuration.Settings.Order")
+                    </div>
+                    <div class="actions">
+                        <div class="btn-group btn-group-devided">
+                            <button class="btn btn-success" type="submit" name="save"><i class="fa fa-check"></i> @T("Admin.Common.Save") </button>
+                        </div>
+                    </div>
+                    <vc:admin-widget widget-zone="order_settings_buttons" additional-data="null" />
+                </div>
+                <div class="portlet-body">
+                    <div class="form-horizontal">
+                        <div class="form-body">
+                            @await Component.InvokeAsync("StoreScopeConfiguration")
+                        </div>
+                    </div>
+                </div>
+                <div class="portlet-body form">
+                    <vc:admin-widget widget-zone="order_settings_top" additional-data="null" />
+                    <div id="ordersettings-edit" style="display:none">
+                        <ul>
+                            <li tab-index="0">
+                                @T("Admin.Configuration.Settings.Order.OrderSettings")
+                            </li>
+                            <li tab-index="1">
+                                @T("Admin.Configuration.Settings.Order.ReturnRequestSettings")
+                            </li>
+                        </ul>
+                        <div>
+                            <partial name="Order.TabOrderSettings" model="Model" />
+                        </div>
+                        <div>
+                            <partial name="Order.TabReturnRequestSettings" model="Model" />
+                        </div>
+                    </div>
+                    <vc:admin-widget widget-zone="order_settings_bottom" additional-data="null" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#ordersettings-edit").show();
+            $("#ordersettings-edit").kendoTabStrip({
+                animation: {
+                    open: {
+                        effects: "fadeIn"
+                    }
+                },
+                select: tabstrip_on_tab_select
+            });
+        });
+    </script>
+
+    @{
+        //custom tabs
+        var eventMessage = new AdminTabStripCreated(this.Html, "ordersettings-edit");
+        eventPublisher.Publish(eventMessage);
+        foreach (var eventBlock in eventMessage.BlocksToRender)
+        {
+           @eventBlock
+        }
+    }
+
+        @*save selected tab index*@
+        <input type="hidden" id="selected-tab-index" name="selected-tab-index" value="@(GetSelectedTabIndex())">
+</form>
+

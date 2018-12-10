@@ -1,0 +1,72 @@
+﻿@model KnowledgebaseArticleModel
+@inject IEventPublisher eventPublisher
+<div asp-validation-summary="All"></div>
+<input asp-for="Id" type="hidden" />
+<script>
+    $(document).ready(function () {
+        $('#knowledgebasearticle-edit').show();
+        $("#knowledgebasearticle-edit").kendoTabStrip({
+            animation: {
+                open: {
+                    effects: "fadeIn"
+                }
+            },
+            select: tabstrip_on_tab_select
+        });
+    });
+</script>
+
+<div id="knowledgebasearticle-edit" style="display:none">
+    <ul>
+        <li tab-index="0">
+            @T("Admin.ContentManagement.Knowledgebase.KnowledgebaseArticle.Info")
+        </li>
+        <li tab-index="1">
+            @T("Admin.ContentManagement.Knowledgebase.KnowledgebaseArticle.Seo")
+        </li>
+        <li tab-index="2">
+            @T("Admin.ContentManagement.Knowledgebase.KnowledgebaseArticle.Related")
+        </li>
+        <li tab-index="3">
+            @T("Admin.ContentManagement.Knowledgebase.KnowledgebaseArticle.Acl")
+        </li>
+        <li tab-index="4">
+            @T("Admin.ContentManagement.Knowledgebase.KnowledgebaseArticle.Stores")
+        </li>
+        <li tab-index="5">
+            @T("Admin.ContentManagement.Knowledgebase.KnowledgebaseArticle.ActivityLog")
+        </li>
+    </ul>
+    <div>
+        <partial name="_CreateOrUpdateArticle.TabInfo" model="Model" />
+    </div>
+    <div>
+        <partial name="_CreateOrUpdateArticle.TabSeo" model="Model" />
+    </div>
+    <div>
+        <partial name="_CreateOrUpdateArticle.TabRelated" model="Model" />
+    </div>
+    <div>
+        <partial name="_TabAcl" model="Model" />
+    </div>
+    <div>
+        <partial name="_TabStores" model="Model" />
+    </div>
+    <div>
+        <partial name="_CreateOrUpdateArticle.TabActivityLog" model="Model" />
+    </div>
+</div>
+
+@{
+    //custom tabs
+    var eventMessage = new AdminTabStripCreated(this.Html, "knowledgebasearticle-edit");
+    eventPublisher.Publish(eventMessage);
+    foreach (var eventBlock in eventMessage.BlocksToRender)
+    {
+        @eventBlock
+    }
+}
+
+
+@*save selected tab index*@
+<input type="hidden" id="selected-tab-index" name="selected-tab-index" value="@(GetSelectedTabIndex())">
